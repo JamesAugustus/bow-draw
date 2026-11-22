@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "Bow Draw: where the carries of the central binomial coefficients catch up with the number of rows"
+version: "1.0"
+date-released: "2026-11-23"
+authors:
+  - given-names: "James"
+    family-names: "Augustus"
+    orcid: "https://orcid.org/0009-0002-7286-7730"
+license:
+  - MIT
+  - CC-BY-4.0

@@ -1,0 +1,30 @@
+// bow_draw_block64.comp -- see bow_draw_gpu.c. SPDX-License-Identifier: MIT
+#version 450
+#extension GL_ARB_gpu_shader_int64 : enable
+// Bow Draw, GPU, 64-bit n. No division: a = floor(n/2) and b = n - a are kept as digit arrays in base p;
+// when n grows by one, either b or a grows by one (in turn). Carries = number of overflows in the sum a + b.
+layout(local_size_x = 64) in;
+layout(std430, binding = 0) buffer O { ivec4 cik[]; };
+layout(push_constant) uniform PC { uint p; uint n0lo; uint n0hi; uint B; uint nblok; uint Nlo; uint Nhi; uint L; } pc;
+void main() {
+    uint i = (gl_WorkGroupID.y * gl_NumWorkGroups.x + gl_WorkGroupID.x) * 64u + gl_LocalInvocationID.x;
+    if (i >= pc.nblok) return;
+    uint64_t p = uint64_t(pc.p), N = (uint64_t(pc.Nhi) << 32) | uint64_t(pc.Nlo);
+    uint64_t n = ((uint64_t(pc.n0hi) << 32) | uint64_t(pc.n0lo)) + uint64_t(i) * uint64_t(pc.B) + 1ul;
+    uint A[48], Bd[48];
+    uint64_t a = n >> 1, b = n - a;
+    for (uint k = 0u; k < pc.L; k++) { A[k] = uint(a % p); a /= p; Bd[k] = uint(b % p); b /= p; }
+    uint P = pc.p;
+    int s = 0, mn = 2147483647, mx = -2147483647;
+    for (uint j = 0u; j < pc.B; j++) {
+        if (n > N) break;
+        uint c = 0u, e = 0u;
+        for (uint k = 0u; k < pc.L; k++) { uint t = A[k] + Bd[k] + c; c = (t >= P) ? 1u : 0u; e += c; }
+        s += int(e) - 1; mn = min(mn, s); mx = max(mx, s);
+        // n -> n + 1: if n is even b grows, if n is odd a grows
+        if ((n & 1ul) == 0ul) { for (uint k = 0u; k < pc.L; k++) { Bd[k]++; if (Bd[k] < P) break; Bd[k] = 0u; } }
+        else                  { for (uint k = 0u; k < pc.L; k++) { A[k]++;  if (A[k]  < P) break; A[k]  = 0u; } }
+        n++;
+    }
+    cik[i] = ivec4(s, mn, mx, 0);
+}

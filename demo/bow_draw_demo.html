@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bow Draw demo</title>
+<!-- Bow Draw demo (FactorX): one HTML file, no network needed. Open it in a browser.
+     Copyright (c) 2026 James Augustus. SPDX-License-Identifier: MIT. Identifiers are in Turkish.
+     Address bar options: ?b=10&g=1200&auto=1  ?lang=en  ?instant=1  ?selftest=1  ?frame=K  ?fly=J -->
+<style>
+:root { --ink:#182731; --ink2:#52514e; --grey:#9aa8b1; --light:#d9dee2; --bg:#fcfcfb; --blue:#2a78d6; --orange:#eb6834; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: "DejaVu Sans", "Segoe UI", Arial, sans-serif; }
+main { max-width: 1010px; margin: 0 auto; padding: 16px; }
+h1 { font-size: 30px; margin: 4px 0 4px; }
+.sub { color: var(--ink2); font-size: 15px; margin: 0 0 14px; }
+.bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 10px; }
+label { font-size: 16px; }
+input { font-size: 18px; width: 130px; padding: 5px 8px; border: 1px solid var(--grey); border-radius: 6px; }
+button { font: inherit; font-size: 16px; border: 0; border-radius: 8px; padding: 8px 14px; cursor: pointer; }
+#shoot { background: var(--orange); color: #fff; font-weight: bold; }
+#shoot:disabled { opacity: .6; cursor: default; }
+#lang { background: var(--light); margin-left: auto; }
+.chips button { background: #eef4fc; color: var(--ink); padding: 4px 12px; font-size: 15px; }
+#lc { font-size: 15px; color: var(--ink2); }
+canvas { width: 100%; height: auto; background: #fff; border: 1px solid var(--light); border-radius: 10px; display: block; }
+#info { font-size: 17px; line-height: 1.55; margin-top: 12px; white-space: pre-line; min-height: 8em; }
+#selftest { font-size: 12px; }
+</style>
+</head>
+<body>
+<main>
+  <h1 id="title"></h1>
+  <p class="sub" id="sub"></p>
+  <div class="bar">
+    <label id="lb" for="b"></label><input id="b" type="number" min="2" max="100000" value="10">
+    <label id="lg" for="g"></label><input id="g" type="number" min="1">
+    <button id="shoot"></button>
+    <button id="lang"></button>
+  </div>
+  <div class="bar chips" id="chips"><span id="lc"></span></div>
+  <canvas id="c" width="980" height="560" role="img"></canvas>
+  <div id="info" aria-live="polite"></div>
+  <pre id="selftest" hidden></pre>
+</main>
+<script>
+"use strict";
+// ---------- Bow Draw: the same definitions as FactorX Section 4 and (5.2), exact integers (BigInt) ----------
+function f(m, b) { let s = 0n, q = b; while (q <= m) { s += m / q; q *= b; } return s; }
+function g(n, q) { const a = n / q, r = n % q; return q * a * (a - 1n) / 2n + a * (r + 1n); }
+function S(n, b) { let s = 0n, q = b; while (q <= n) { s += g(n, q); q *= b; } return s; }
+function E(n, b) {            // carries of floor(k/2) + ceil(k/2) over the rows 1..n, in base b
+  const m = n / 2n;
+  let t = m > 0n ? 4n * S(m, b) - f(m, b) : 0n;
+  if (n % 2n) t += f(m, b) + f(m + 1n, b);
+  return S(n, b) - t;
+}
+function nDraw(b) {
+  if (b % 2n === 0n) return b ** 3n + b * b + b - 2n;
+  if (b % 6n === 1n) return b ** 3n + (2n * b * b + 2n * b - 7n) / 3n;
+  if (b % 6n === 3n) return b ** 3n + (2n * b * b + 2n * b - 6n) / 3n;
+  return b ** 3n + (4n * b * b + 5n * b - 11n) / 6n;
+}
+function universes(n) {       // [a][a]_b = a(b + 1) = n, b >= 1
+  const ds = new Set([n]);
+  for (let d = 2; d * d <= n; d++) if (n % d === 0) { ds.add(d); ds.add(n / d); }
+  return [...ds].sort((x, y) => y - x).map(d => [n / d, d - 1]);
+}
+function big(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " "); }
+function minus(s) { return String(s).replace("-", "−"); }
+function dativeTr(n) {        // Turkish dative suffix: 1108'e, 1882'ye, 10'a
+  const one = { 1: "e", 2: "ye", 3: "e", 4: "e", 5: "e", 6: "ya", 7: "ye", 8: "e", 9: "a" };
+  const ten = { 1: "a", 2: "ye", 3: "a", 4: "a", 5: "ye", 6: "a", 7: "e", 8: "e", 9: "a" };
+  if (n % 10n) return "'" + one[Number(n % 10n)];
+  if (n % 100n) return "'" + ten[Number(n / 10n % 10n)];
+  if (n % 1000000n) return "'e";
+  return "'a";
+}
+
+const TXT = {
+  tr: { title: "Bow Draw gösterisi", sub: "Bir evren seç. Yay o evrenin taşmalarıyla gerilir, ok taşmaların sayılara yetiştiği yere düşer.",
+    b: "Evren (taban) b:", g: "Tahminin:", shoot: "Yayı ger ve at!", lang: "English", chips: "Hazır evrenler:",
+    bow: "yay", line: "sayı doğrusu", curve: "yayın kendisi: taşmalar − sayılar",
+    bad_b: "b, 2 ile 100 000 arasında bir tam sayı olmalı.", bad_g: "Tahmin pozitif bir tam sayı olmalı (ya da boş bırak).",
+    landed: "Ok {n}{e} düştü.  b × b × b = {c}.  En gergin yer: fark {d}.",
+    guess: "Tahminin {g}: {x} uzak.  ", s3: "Tam isabet! ★★★", s2: "Çok yakın! ★★", s1: "Yakın! ★",
+    s0: "Bir daha dene! İpucu: b × b × b'nin biraz ötesi.", noguess: "Bir dahakine bir tahmin yaz!",
+    p_odd: "Bu evrende okun yalnız bu yere düştüğü kanıtlı.",
+    p_even: "Bu evrende okun yalnız bu yere düştüğü bilgisayarla sayıldı (b < 2000).",
+    p_big: "Ok buraya düşer (kanıtlı). Başka bir yere düşmediği bu evren için sınanmadı.",
+    check: "Denetim: bir önceki sayıda fark {a}, burada 0, bir sonrakinde {c}.", fail: "Denetim BAŞARISIZ: {a}, {z}, {c}",
+    prime: "{b} yalnız bir evrende görünür: {w}. Yani {b} asaldır.",
+    copy: "{b}, {k} evrende görünür: {w}. Yani {b} bir kopyadır, asal değildir.",
+    hint: "Bir evren sayısı yaz (örnek: 10), istersen okun nereye düşeceğini tahmin et ve oku at.",
+    aria: "Yay, sayı doğrusu ve Bow Draw eğrisi" },
+  en: { title: "Bow Draw demo", sub: "Pick a universe. The bow is drawn by the carries of that universe, the arrow lands where the carries catch up with the numbers.",
+    b: "Universe (base) b:", g: "Your guess:", shoot: "Draw the bow and shoot!", lang: "Türkçe", chips: "Ready universes:",
+    bow: "bow", line: "number line", curve: "the bow itself: carries − numbers",
+    bad_b: "b must be a whole number from 2 to 100 000.", bad_g: "The guess must be a positive whole number (or leave it empty).",
+    landed: "The arrow landed at {n}.  b × b × b = {c}.  Tightest point: difference {d}.",
+    guess: "Your guess {g}: {x} away.  ", s3: "Bull's eye! ★★★", s2: "Very close! ★★", s1: "Close! ★",
+    s0: "Try again! Hint: a little beyond b × b × b.", noguess: "Next time, type a guess!",
+    p_odd: "In this universe it is proved that the arrow lands only here.",
+    p_even: "In this universe a computer counted that the arrow lands only here (b < 2000).",
+    p_big: "The arrow lands here (proved). That it lands nowhere else was not tested for this universe.",
+    check: "Check: difference {a} one step before, 0 here, {c} one step after.", fail: "Check FAILED: {a}, {z}, {c}",
+    prime: "{b} appears in one universe only: {w}. So {b} is prime.",
+    copy: "{b} appears in {k} universes: {w}. So {b} is a copy, not a prime.",
+    hint: "Type a universe number (for example 10), guess where the arrow will land if you like, and shoot.",
+    aria: "Bow, number line and Bow Draw curve" },
+};
+function fmt(s, o) { return s.replace(/\{(\w+)\}/g, (_, k) => o[k]); }
+
+const INK = "#182731", INK2 = "#52514e", GREY = "#9aa8b1", LIGHT = "#d9dee2", BLUE = "#2a78d6", ORANGE = "#eb6834";
+const W = 980, H = 560, X0 = 190, X1 = 940, LY = 150, BX = 95, BY = 150, BH = 85, CY0 = 300, CY1 = 535;
+const FONT = '"DejaVu Sans", "Segoe UI", Arial, sans-serif';
+const P = new URLSearchParams(location.search);
+let lang = P.get("lang") || ((navigator.language || "en").toLowerCase().startsWith("tr") ? "tr" : "en"); if (lang !== "tr") lang = "en";
+const $ = id => document.getElementById(id);
+const cv = $("c"), ctx = cv.getContext("2d");
+const dpr = window.devicePixelRatio || 1;
+cv.width = W * dpr; cv.height = H * dpr; ctx.scale(dpr, dpr);
+let st = null, busy = false;
+const t = k => TXT[lang][k];
+
+function labels() {
+  document.documentElement.lang = lang; document.title = t("title");
+  $("title").textContent = t("title"); $("sub").textContent = t("sub");
+  $("lb").textContent = t("b"); $("lg").textContent = t("g"); $("shoot").textContent = t("shoot");
+  $("lang").textContent = t("lang"); $("lc").textContent = t("chips"); cv.setAttribute("aria-label", t("aria"));
+}
+
+// ---------- drawing ----------
+function text(s, x, y, size, col, opt = {}) {
+  ctx.font = (opt.bold ? "bold " : "") + size + "px " + FONT; ctx.fillStyle = col;
+  ctx.textAlign = opt.align || "center"; ctx.textBaseline = "middle"; ctx.fillText(s, x, y);
+}
+function line(pts, col, w) {
+  ctx.beginPath(); ctx.moveTo(pts[0], pts[1]);
+  for (let i = 2; i < pts.length; i += 2) ctx.lineTo(pts[i], pts[i + 1]);
+  ctx.strokeStyle = col; ctx.lineWidth = w; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.stroke();
+}
+function arrow(x1, x2, y) {
+  line([x1, y, x2 - 14, y], ORANGE, 4);
+  ctx.beginPath(); ctx.moveTo(x2, y); ctx.lineTo(x2 - 18, y - 8); ctx.lineTo(x2 - 18, y + 8); ctx.closePath();
+  ctx.fillStyle = ORANGE; ctx.fill();
+}
+const xn = n => X0 + (X1 - X0) * Number(n) / st.nmax;
+
+function scene(pull, arrowX = null, upto = -1, landed = false) {
+  ctx.clearRect(0, 0, W, H);
+  text(t("bow"), BX, 30, 13, INK2);
+  line([X0, LY, X1, LY], GREY, 2);
+  text(t("line"), (X0 + X1) / 2, LY + 50, 12, INK2);
+  if (st) {
+    for (const [n, lab] of [[0n, "0"], [st.b ** 3n, "b³ = " + big(st.b ** 3n)]]) {
+      const x = xn(n); line([x, LY - 8, x, LY + 8], INK2, 2); text(lab, x, LY + 24, 12, INK2);
+    }
+    if (st.guess) {
+      const x = xn(st.guess); line([x, LY - 30, x, LY], BLUE, 3);
+      ctx.beginPath(); ctx.moveTo(x, LY - 30); ctx.lineTo(x + 18, LY - 24); ctx.lineTo(x, LY - 18); ctx.closePath();
+      ctx.fillStyle = BLUE; ctx.fill(); text(big(st.guess), x, LY + 40, 12, BLUE, { bold: true });
+    }
+  }
+  ctx.beginPath(); ctx.moveTo(BX, BY - BH); ctx.quadraticCurveTo(BX + 84, BY, BX, BY + BH);
+  ctx.strokeStyle = INK; ctx.lineWidth = 5; ctx.lineCap = "round"; ctx.stroke();
+  const sx = BX - 70 * pull;
+  line([BX, BY - BH, sx, BY, BX, BY + BH], GREY, 2);
+  if (arrowX === null) arrow(sx, sx + 120, BY); else arrow(arrowX - 120, arrowX, BY);
+  if (landed) {
+    const x = xn(st.nb);
+    ctx.beginPath(); ctx.arc(x, LY, 16, 0, 7); ctx.strokeStyle = ORANGE; ctx.lineWidth = 3; ctx.stroke();
+    ctx.beginPath(); ctx.arc(x, LY, 6, 0, 7); ctx.fillStyle = ORANGE; ctx.fill();
+    text("n(" + st.b + ") = " + big(st.nb), Math.min(x, X1 - 70), LY - 36, 15, INK, { bold: true });
+  }
+  if (upto >= 0) curve(upto);
+}
+
+function curve(upto) {
+  ctx.strokeStyle = LIGHT; ctx.lineWidth = 1; ctx.strokeRect(X0 - 10, CY0 - 10, X1 - X0 + 20, CY1 - CY0 + 20);
+  text(t("curve"), X0, CY0 - 26, 13, INK2, { align: "left" });
+  const yv = d => CY1 - (CY1 - CY0) * (d - st.lo) / (st.hi - st.lo);
+  line([X0, yv(0), X1, yv(0)], GREY, 1);
+  const pts = [];
+  for (let i = 0; i <= upto && i < st.s.length; i++) pts.push(xn(st.s[i][0]), yv(st.s[i][1]));
+  if (pts.length >= 4) line(pts, BLUE, 2);
+  const [n, d] = st.s[Math.min(upto, st.s.length - 1)];
+  ctx.beginPath(); ctx.arc(xn(n), yv(d), 5, 0, 7); ctx.fillStyle = BLUE; ctx.fill();
+  ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; ctx.stroke();
+}
+
+// ---------- the shot ----------
+function prepare() {
+  const bs = $("b").value.trim(), gs = $("g").value.trim();
+  if (!/^\d+$/.test(bs) || Number(bs) < 2 || Number(bs) > 100000) { $("info").textContent = t("bad_b"); return false; }
+  if (gs && (!/^\d+$/.test(gs) || BigInt(gs) < 1n)) { $("info").textContent = t("bad_g"); return false; }
+  const b = BigInt(bs), nb = nDraw(b), guess = gs ? BigInt(gs) : null;
+  const nmax = Math.max(Number(nb) * 1.15, guess ? Number(guess) * 1.08 : 0);
+  const nstar = b % 2n ? b ** 3n - 1n : b ** 3n - b * b - 1n;
+  const set = new Map();
+  for (let k = 0; k <= 140; k++) { const n = nb * BigInt(k) / 140n; set.set(String(n), n); }
+  set.set(String(nstar), nstar);
+  const ns = [...set.values()].sort((x, y) => (x < y ? -1 : x > y ? 1 : 0));
+  for (let k = 1; k <= 20; k++) ns.push(nb + nb * 15n * BigInt(k) / 2000n);
+  const s = ns.map(n => [n, Number(E(n, b) - n)]);
+  const ds = s.map(v => v[1]), dmin = Math.min(...ds);
+  st = { b, nb, guess, nmax, s, dmin, lo: dmin * 1.1, hi: Math.max(Math.max(...ds), -0.25 * dmin),
+         icross: s.findIndex(v => v[0] === nb) };
+  return true;
+}
+
+function result() {
+  const { b, nb, guess } = st, L = [];
+  L.push(fmt(t("landed"), { n: big(nb), e: dativeTr(nb), c: big(b ** 3n), d: minus(st.dmin) }));
+  if (guess) {
+    const x = guess > nb ? guess - nb : nb - guess, r = Number(x) / Number(nb);
+    L.push(fmt(t("guess"), { g: big(guess), x: big(x) }) + (r <= 0.01 ? t("s3") : r <= 0.05 ? t("s2") : r <= 0.2 ? t("s1") : t("s0")));
+  } else L.push(t("noguess"));
+  L.push(b % 2n || b === 2n ? t("p_odd") : b < 2000n ? t("p_even") : t("p_big"));
+  const a = E(nb - 1n, b) - (nb - 1n), z = E(nb, b) - nb, c = E(nb + 1n, b) - (nb + 1n);
+  L.push(a < 0n && z === 0n && c > 0n ? fmt(t("check"), { a: minus(a), c }) : fmt(t("fail"), { a, z, c }));
+  const u = universes(Number(b));
+  const w = u.slice(0, 5).map(([x, y]) => "[" + x + "][" + x + "]_" + y).join("  ") + (u.length > 5 ? " (…)" : "");
+  L.push(u.length === 1 ? fmt(t("prime"), { b, w }) : fmt(t("copy"), { b, k: u.length, w }));
+  $("info").textContent = L.join("\n");
+}
+
+function shoot(instant = false) {
+  if (busy || !prepare()) return;
+  busy = true; $("shoot").disabled = true;
+  const frames = [];
+  const step = Math.max(1, Math.floor(st.icross / 60));
+  for (let k = 0; k <= st.icross; k += step) frames.push(k);
+  frames.push(st.icross);
+  const J = 30, xEnd = xn(st.nb), x0 = BX + 120;
+  const finish = () => { scene(0, xEnd, st.s.length - 1, true); result(); busy = false; $("shoot").disabled = false; };
+  if (instant) return finish();
+  let i = 0, j = 0;
+  const tick = () => {
+    if (i < frames.length) {
+      const k = frames[i++], d = st.s[k][1];
+      scene(d < 0 ? 0.1 + 0.9 * d / st.dmin : 0, null, k);
+    } else if (j <= J) {
+      scene(0, x0 + (xEnd - x0) * j / J, st.icross); j++;
+    } else return finish();
+    setTimeout(tick, 16);
+  };
+  setTimeout(tick, 16);
+}
+
+function selftest() {          // ?selftest=1 : numbers to compare with the Python programs
+  const out = [];
+  const bases = []; for (let b = 2; b <= 400; b++) bases.push(b); bases.push(1000, 1999, 2000, 99991, 100000);
+  out.push("base n(b) D(n(b)-1) D(n(b)) D(n(b)+1) E(12345)");
+  let fails = 0;
+  for (const bb of bases) {
+    const b = BigInt(bb), nb = nDraw(b);
+    const dm = E(nb - 1n, b) - (nb - 1n), d0 = E(nb, b) - nb, dp = E(nb + 1n, b) - (nb + 1n);
+    if (!(dm < 0n && d0 === 0n && dp > 0n)) fails++;
+    out.push([bb, nb, dm, d0, dp, E(12345n, b)].join(" "));
+  }
+  for (const n of [2, 7, 9, 12, 17, 3587, 99991, 100000]) out.push("universes " + n + " " + universes(n).length);
+  for (const n of [1108n, 1882n, 378n, 10n, 20n, 50n, 70n, 100n, 1000n, 2000000n, 2316n, 7110n, 787n]) out.push("turkish-suffix " + n + dativeTr(n));
+  const N = 100000, sieve = new Uint8Array(N + 1).fill(1); sieve[0] = sieve[1] = 0;   // sieve of Eratosthenes, an independent check
+  for (let i = 2; i * i <= N; i++) if (sieve[i]) for (let j = i * i; j <= N; j += i) sieve[j] = 0;
+  let primes = 0, bad = 0;
+  for (let n = 2; n <= N; n++) { const one = universes(n).length === 1; primes += one; if (one !== !!sieve[n]) bad++; }
+  out.push("sieve " + N + " " + primes + " " + bad);
+  out.push("summary: " + bases.length + " bases, " + fails + " failures at n(b); " + primes + " primes below " + N + ", " + bad + " mismatches with the sieve");
+  $("selftest").hidden = false; $("selftest").textContent = out.join("\n");
+}
+
+$("shoot").onclick = () => shoot();
+$("lang").onclick = () => { if (busy) return; lang = lang === "tr" ? "en" : "tr"; labels();
+  if (st) { scene(0, xn(st.nb), st.s.length - 1, true); result(); } else { scene(0.1); $("info").textContent = t("hint"); } };
+for (const id of ["b", "g"]) $(id).addEventListener("keydown", e => { if (e.key === "Enter") shoot(); });
+for (const v of [2, 3, 5, 7, 10, 12, 101, 1000]) {
+  const bt = document.createElement("button"); bt.textContent = v;
+  bt.onclick = () => { if (busy) return; $("b").value = v; shoot(); }; $("chips").appendChild(bt);
+}
+labels(); scene(0.1); $("info").textContent = t("hint");
+if (P.get("b")) $("b").value = P.get("b");
+if (P.get("g")) $("g").value = P.get("g");
+if (P.get("selftest")) selftest();
+if (P.get("frame") !== null || P.get("fly") !== null) {      // a single frame for figures: ?b=10&frame=K (sample point) or ?b=10&fly=J (flight, 0-30)
+  if (prepare()) {
+    if (P.get("fly") !== null) { const J = 30, xEnd = xn(st.nb), x0 = BX + 120; scene(0, x0 + (xEnd - x0) * Number(P.get("fly")) / J, st.icross); }
+    else { const k = Math.min(Number(P.get("frame")), st.icross), d = st.s[k][1]; scene(d < 0 ? 0.1 + 0.9 * d / st.dmin : 0, null, k); }
+  }
+} else if (P.get("auto") || P.get("instant")) shoot(!!P.get("instant"));
+else if (!P.get("selftest")) shoot();      // first visit: one shot for the default base, so the page is never empty
+</script>
+</body>
+</html>
