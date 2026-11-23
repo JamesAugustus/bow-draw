@@ -4,7 +4,7 @@ James Augustus · ORCID [0009-0002-7286-7730](https://orcid.org/0009-0002-7286-7
 
 Sayıların evren dili ve asıl örneği: Bow Draw
 
-Sürüm 1.0, 23 Kasım 2026
+Sürüm 1.0, 23 Kasım 2026 · DOI [10.5281/zenodo.24451375](https://doi.org/10.5281/zenodo.24451375)
 
 ## Öz
 

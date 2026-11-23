@@ -4,7 +4,7 @@ James Augustus · ORCID [0009-0002-7286-7730](https://orcid.org/0009-0002-7286-7
 
 Where the carries of the central binomial coefficients catch up with the number of rows
 
-Version 1.0, 23 November 2026
+Version 1.0, 23 November 2026 · DOI [10.5281/zenodo.24451375](https://doi.org/10.5281/zenodo.24451375)
 
 ## Abstract
 
@@ -578,7 +578,7 @@ For every p the program checks, in exact integer arithmetic with GMP: E_p(n(p)) 
 6. D. H. Lehmer, "An extended theory of Lucas' functions", Annals of Mathematics (2) 31 (1930), no. 3, 419–448, doi:10.2307/1968235.
 7. Great Internet Mersenne Prime Search, List of known Mersenne prime numbers, https://www.mersenne.org/primes/, accessed 22 November 2026.
 8. J. Augustus, "Pascal Mersenne Rows: powers of two as carry-free Pascal rows in Mersenne bases", 2026, https://github.com/JamesAugustus/pascal-mersenne-rows.
-9. J. Augustus, "FactorX: the universe language of numbers and its main example, Bow Draw", version 1.0, 2026, companion document.
+9. J. Augustus, "FactorX: the universe language of numbers and its main example, Bow Draw", version 1.0, 2026, companion document in the same archive, doi:10.5281/zenodo.24451375.
 10. A. Granville, "Arithmetic properties of binomial coefficients I: Binomial coefficients modulo prime powers", in: J. Borwein et al. (eds.), Organic Mathematics (Burnaby, BC, 1995), CMS Conference Proceedings 20, American Mathematical Society, Providence, RI, 1997, 253–276, https://dms.umontreal.ca/~andrew/Binomial/.
 11. H. Delange, "Sur la fonction sommatoire de la fonction « somme des chiffres »", L'Enseignement Mathématique (2) 21 (1975), 31–47, doi:10.5169/seals-47328.
 12. J. R. Trollope, "An explicit expression for binary digital sums", Mathematics Magazine 41 (1968), no. 1, 21–25, doi:10.1080/0025570X.1968.11975826.

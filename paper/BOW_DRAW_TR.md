@@ -4,7 +4,7 @@ James Augustus · ORCID [0009-0002-7286-7730](https://orcid.org/0009-0002-7286-7
 
 Merkez binom katsayılarında eldelerin satır sayısına yetiştiği nokta
 
-Sürüm 1.0, 23 Kasım 2026
+Sürüm 1.0, 23 Kasım 2026 · DOI [10.5281/zenodo.24451375](https://doi.org/10.5281/zenodo.24451375)
 
 ## Öz
 
@@ -578,7 +578,7 @@ Program her p için GMP ile tam sayı aritmetiğinde şunları denetler: E_p(n(p
 6. D. H. Lehmer, "An extended theory of Lucas' functions", Annals of Mathematics (2) 31 (1930), no. 3, 419–448, doi:10.2307/1968235.
 7. Great Internet Mersenne Prime Search, bilinen Mersenne asalları listesi, https://www.mersenne.org/primes/, erişim 22 Kasım 2026.
 8. J. Augustus, "Pascal Mersenne Rows: powers of two as carry-free Pascal rows in Mersenne bases", 2026, https://github.com/JamesAugustus/pascal-mersenne-rows.
-9. J. Augustus, "FactorX: the universe language of numbers and its main example, Bow Draw", sürüm 1.0, 2026, eşlik eden belge.
+9. J. Augustus, "FactorX: the universe language of numbers and its main example, Bow Draw", sürüm 1.0, 2026, aynı arşivde eşlik eden belge, doi:10.5281/zenodo.24451375.
 10. A. Granville, "Arithmetic properties of binomial coefficients I: Binomial coefficients modulo prime powers", içinde: J. Borwein ve diğerleri (ed.), Organic Mathematics (Burnaby, BC, 1995), CMS Conference Proceedings 20, American Mathematical Society, Providence, RI, 1997, 253–276, https://dms.umontreal.ca/~andrew/Binomial/.
 11. H. Delange, "Sur la fonction sommatoire de la fonction « somme des chiffres »", L'Enseignement Mathématique (2) 21 (1975), 31–47, doi:10.5169/seals-47328.
 12. J. R. Trollope, "An explicit expression for binary digital sums", Mathematics Magazine 41 (1968), no. 1, 21–25, doi:10.1080/0025570X.1968.11975826.
