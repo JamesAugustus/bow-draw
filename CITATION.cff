@@ -1,5 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this work, please cite it as below."
+type: software
 title: "Bow Draw: where the carries of the central binomial coefficients catch up with the number of rows"
 version: "1.0"
 date-released: "2026-11-23"
@@ -8,6 +9,27 @@ authors:
     family-names: "Augustus"
     orcid: "https://orcid.org/0009-0002-7286-7730"
     email: "jamesaugustus1313@gmail.com"
+repository-code: "https://github.com/JamesAugustus/bow-draw"
+abstract: >-
+  Fix a base b ≥ 2. For every row k of Pascal's triangle, add ⌊k/2⌋ and ⌈k/2⌉ in base b and count
+  the carries; let E_b(n) be the total over the rows 1 to n. The difference E_b(n) − n first falls,
+  reaches a minimum near b³ and then crosses zero at an exact point n(b), given by a formula that
+  depends only on b modulo 6; for even b, n(b) = b³ + b² + b − 2. For a prime p, n(p) is the point
+  from which p^n divides the product of the central binomial coefficients C(1, 0)·C(2, 1)···C(n, ⌊n/2⌋).
+  For every odd base and for b = 2 the existence, the location and the uniqueness are proved by hand;
+  for even b ≥ 4 the existence is a computer-assisted proof and the uniqueness is measured for b < 2000.
+  The package contains the paper in English and Turkish, the companion text FactorX, all programs
+  (Python, C, Vulkan) with their raw output, checks over the 51 Mersenne primes up to 2^136279841 − 1,
+  and a teaching demo.
+keywords:
+  - number theory
+  - Pascal's triangle
+  - central binomial coefficients
+  - carries
+  - Kummer's theorem
+  - p-adic valuation
+  - digit sums
+  - Mersenne primes
 license:
   - MIT
   - CC-BY-4.0
