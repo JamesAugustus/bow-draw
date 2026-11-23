@@ -88,4 +88,4 @@ Depo adresi ve DOI, çalışma yayımlanınca buraya eklenecek. Atıf bilgisi [C
 
 Düzeltmeler ve eksik kaynaklar memnuniyetle karşılanır. Sonraki sürümde eklerim ve bildireni anarım.
 
-James Augustus · ORCID [0009-0002-7286-7730](https://orcid.org/0009-0002-7286-7730)
+James Augustus · ORCID [0009-0002-7286-7730](https://orcid.org/0009-0002-7286-7730) · jamesaugustus1313@gmail.com

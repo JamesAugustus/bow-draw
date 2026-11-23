@@ -88,4 +88,4 @@ The repository address and the DOI will be added here when the work is published
 
 Corrections and missing references are welcome. I will add them in the next version and name the person who reported them.
 
-James Augustus · ORCID [0009-0002-7286-7730](https://orcid.org/0009-0002-7286-7730)
+James Augustus · ORCID [0009-0002-7286-7730](https://orcid.org/0009-0002-7286-7730) · jamesaugustus1313@gmail.com
