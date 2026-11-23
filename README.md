@@ -80,11 +80,11 @@ The graphics card scan needs Vulkan 1.2 with 64-bit shader integers and `glslc`.
 
 If you use this work in a course, a talk, a paper or a program, please cite it like this:
 
-> James Augustus, "Bow Draw: where the carries of the central binomial coefficients catch up with the number of rows", 2026, ORCID 0009-0002-7286-7730.
+> James Augustus, "Bow Draw: where the carries of the central binomial coefficients catch up with the number of rows", version 1.0, 2026, doi:10.5281/zenodo.24451375.
 
 > James Augustus, "FactorX: the universe language of numbers and its main example, Bow Draw", 2026, ORCID 0009-0002-7286-7730.
 
-The repository address and the DOI will be added here when the work is published. Citation metadata is in [CITATION.cff](CITATION.cff).
+Repository: https://github.com/JamesAugustus/bow-draw · DOI: [10.5281/zenodo.24451375](https://doi.org/10.5281/zenodo.24451375) (archived on Zenodo). Citation metadata is in [CITATION.cff](CITATION.cff).
 
 Corrections and missing references are welcome. I will add them in the next version and name the person who reported them.
 

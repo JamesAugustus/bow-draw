@@ -80,11 +80,11 @@ Ekran kartı taraması 64 bit gölgelendirici tam sayılarıyla Vulkan 1.2 ve `g
 
 Bu çalışmayı bir derste, konuşmada, makalede ya da programda kullanırsanız lütfen şöyle atıf yapın:
 
-> James Augustus, "Bow Draw: where the carries of the central binomial coefficients catch up with the number of rows", 2026, ORCID 0009-0002-7286-7730.
+> James Augustus, "Bow Draw: where the carries of the central binomial coefficients catch up with the number of rows", version 1.0, 2026, doi:10.5281/zenodo.24451375.
 
 > James Augustus, "FactorX: the universe language of numbers and its main example, Bow Draw", 2026, ORCID 0009-0002-7286-7730.
 
-Depo adresi ve DOI, çalışma yayımlanınca buraya eklenecek. Atıf bilgisi [CITATION.cff](CITATION.cff) dosyasındadır.
+Depo: https://github.com/JamesAugustus/bow-draw · DOI: [10.5281/zenodo.24451375](https://doi.org/10.5281/zenodo.24451375) (Zenodo'da arşivli). Atıf bilgisi [CITATION.cff](CITATION.cff) dosyasındadır.
 
 Düzeltmeler ve eksik kaynaklar memnuniyetle karşılanır. Sonraki sürümde eklerim ve bildireni anarım.
 

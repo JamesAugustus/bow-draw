@@ -4,6 +4,7 @@ type: software
 title: "Bow Draw: where the carries of the central binomial coefficients catch up with the number of rows"
 version: "1.0"
 date-released: "2026-11-23"
+doi: "10.5281/zenodo.24451375"
 authors:
   - given-names: "James"
     family-names: "Augustus"
